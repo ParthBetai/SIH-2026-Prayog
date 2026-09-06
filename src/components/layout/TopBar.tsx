@@ -11,6 +11,7 @@ import { Popover } from '@/components/ui/Overlay';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { GovernmentOfIndia, GovernmentOfMaharashtra, StateEmblem } from '@/components/layout/Emblems';
+import { LANGUAGES } from '@/i18n/languages';
 import { useUi } from '@/store/ui';
 import { usePortalBase } from '@/lib/portal';
 import i18n from '@/i18n';
@@ -35,6 +36,64 @@ const PORTAL: Record<string, { labelKey: string; home: string }> = {
  * It scrolls away with the page: the bar under it is what has to stay
  * reachable, and two stacked sticky strips would eat 104px of every screen.
  */
+
+/**
+ * The language picker.
+ *
+ * Driven by `LANGUAGES` rather than by a hard-coded pair, so a language added
+ * to that list appears here, in the right order, named in itself. The trigger
+ * shows the language you are reading — not the one you would switch to — because
+ * with three of them "the other one" is no longer a thing a button can mean.
+ */
+function LanguagePicker({ compact = false }: { compact?: boolean }) {
+  const { t } = useTranslation();
+  const locale = useUi((s) => s.locale);
+  const setLocale = useUi((s) => s.setLocale);
+  const current = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
+
+  return (
+    <Popover
+      label={t('app.language')}
+      align="right"
+      trigger={({ onClick, ref, ...aria }) => (
+        <button
+          ref={ref}
+          onClick={onClick}
+          {...aria}
+          className={`press h-8 border border-deep-rule text-label text-deep-dim hover:border-deep-dim hover:text-deep-ink ${
+            compact ? 'rounded-control px-2' : 'rounded-pill px-3'
+          }`}
+        >
+          {compact ? current.short : current.endonym}
+        </button>
+      )}
+    >
+      {(close) => (
+        <ul>
+          {LANGUAGES.map((l, i) => (
+            <li key={l.code} className={i < LANGUAGES.length - 1 ? 'border-b border-rule' : ''}>
+              <button
+                type="button"
+                onClick={() => {
+                  setLocale(l.code);
+                  close();
+                }}
+                aria-current={l.code === locale ? 'true' : undefined}
+                className={`w-full py-2 text-left text-body hover:text-verify ${
+                  l.code === locale ? 'font-semibold text-verify' : 'text-ink'
+                }`}
+              >
+                {l.endonym}
+              </button>
+            </li>
+          ))}
+          <li className="pt-2 text-micro text-ink-soft">{t('chrome.languageNote')}</li>
+        </ul>
+      )}
+    </Popover>
+  );
+}
+
 function GovernmentStrip() {
   return (
     <div className="gov-strip border-b border-deep-rule">
@@ -85,7 +144,6 @@ export function TopBar({
   const markRead = useMarkRead();
   const setPaletteOpen = useUi((s) => s.setPaletteOpen);
   const locale = useUi((s) => s.locale);
-  const setLocale = useUi((s) => s.setLocale);
   const scenario = useUi((s) => s.scenario);
   const setScenarioState = useUi((s) => s.setScenario);
   const queryClient = useQueryClient();
@@ -232,14 +290,7 @@ export function TopBar({
             <span className="font-display text-mark tracking-mega text-deep-ink">{t('portal.public')}</span>
 
             <div className="ml-auto flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setLocale(locale === 'en' ? 'hi' : 'en')}
-                aria-label={t('app.language')}
-                className="press h-8 rounded-pill border border-deep-rule px-3 text-label text-deep-dim hover:border-deep-dim hover:text-deep-ink"
-              >
-                {locale === 'en' ? 'हिन्दी' : 'English'}
-              </button>
+              <LanguagePicker />
               <Link
                 to="/"
                 className="press inline-flex h-8 items-center rounded-pill border border-deep-rule px-3.5 text-label text-deep-ink no-underline hover:border-saffron hover:text-saffron-ink"
@@ -342,40 +393,7 @@ export function TopBar({
             <kbd className="hidden rounded-control border border-deep-rule px-1 text-micro xl:inline">Ctrl K</kbd>
           </button>
 
-          <Popover
-            label={t('app.language')}
-            align="right"
-            trigger={({ onClick, ref, ...aria }) => (
-              <button
-                ref={ref}
-                onClick={onClick}
-                {...aria}
-                className="press h-8 rounded-control border border-deep-rule px-2 text-label text-deep-dim hover:border-deep-dim hover:text-deep-ink"
-              >
-                {locale === 'en' ? 'EN' : 'हिं'}
-              </button>
-            )}
-          >
-            {(close) => (
-              <ul>
-                {(['en', 'hi'] as const).map((l) => (
-                  <li key={l}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLocale(l);
-                        close();
-                      }}
-                      className="w-full border-b border-rule py-2 text-left text-body text-ink last:border-b-0 hover:text-verify"
-                    >
-                      {l === 'en' ? 'English' : 'हिन्दी'}
-                    </button>
-                  </li>
-                ))}
-                <li className="pt-2 text-micro text-ink-soft">{t('chrome.languageNote')}</li>
-              </ul>
-            )}
-          </Popover>
+          <LanguagePicker compact />
 
           <Popover
             label={t('app.alerts')}

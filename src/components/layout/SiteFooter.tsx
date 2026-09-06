@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LEGAL_DOCUMENTS, legalPath, type Bilingual } from '@/config/legal';
+import { LEGAL_DOCUMENTS, legalPath, type Localised } from '@/config/legal';
+import { readingLanguage } from '@/i18n/languages';
 import { publicLinksFor } from '@/config/nav';
 import { platformNow } from '@/config/clock';
 import { usePortalLink } from '@/lib/portal';
@@ -24,8 +25,8 @@ import { GovernmentOfIndia } from './Emblems';
  */
 export function SiteFooter() {
   const { t, i18n } = useTranslation();
-  const hindi = i18n.language.startsWith('hi');
-  const say = (b: Bilingual): string => (hindi ? b.hi : b.en);
+  const lang = readingLanguage(i18n.language);
+  const say = (b: Localised): string => b[lang];
 
   // Shared pages follow you into your portal rather than throwing you onto the
   // public site; the policies are the same document from anywhere.

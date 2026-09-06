@@ -9,6 +9,7 @@ import { PortalGuard } from './PortalGuard';
 import type { Role } from '@/config/rbac';
 import { useUi } from '@/store/ui';
 import { platformNow } from '@/config/clock';
+import { clockTime } from '@/lib/format';
 
 export function Toasts() {
   const toasts = useUi((s) => s.toasts);
@@ -168,17 +169,18 @@ export function PageHeader({
 }
 
 export function FreshnessLine({ servedAt, onRefresh }: { servedAt: string; onRefresh?: () => void }) {
+  const { t } = useTranslation();
   const at = new Date(servedAt);
   const stale = platformNow().getTime() - at.getTime() > 15 * 60 * 1000;
   return (
     <p className={['mt-3 flex items-center gap-3 text-micro', stale ? 'text-ink' : 'text-ink-soft'].join(' ')}>
       <span className={stale ? 'border-l-2 border-l-hold bg-hold-wash px-2 py-0.5' : ''}>
-        Data as of {at.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}
-        {stale ? ' — this is older than it should be' : ''}
+        {t('app.dataAsOf', { time: clockTime(at) })}
+        {stale ? t('states.olderThanExpected') : ''}
       </span>
       {onRefresh ? (
         <button type="button" onClick={onRefresh} className="underline underline-offset-2 hover:text-ink">
-          Refresh
+          {t('app.refresh')}
         </button>
       ) : null}
     </p>

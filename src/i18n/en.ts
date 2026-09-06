@@ -176,6 +176,11 @@ const en = {
     programmeSettings: "Programme settings",
     programmeSettingsNote: "Every rule the platform runs on, in eight registers",
   },
+  gateFile: {
+    summary: 'This case has cleared {{cleared}} of {{total}} gates. It is standing on gate {{at}}, {{gate}}. Each gate is a written decision with an owner and a date.',
+    openCase: 'Open case',
+    footnote: 'Every line above has an owner, a written reason and a date. All seven are public.',
+  },
   gate: {
     ladder: 'Gate ladder',
     current: 'Gate {{number}} of 7 · {{status}}',
@@ -223,6 +228,7 @@ const en = {
     forbiddenHelp: '{{action}} requires {{role}} access.',
     requestAccess: 'Request access',
     partialFailure: 'This panel did not load. The rest of the page is unaffected.',
+    olderThanExpected: ' — this is older than it should be',
     savePreserved: 'Unable to save. Your changes are preserved.',
     retry: 'Retry',
   
@@ -672,6 +678,7 @@ const en = {
       eyebrow: "Published outcomes",
       title: "Every completed pilot, whether or not it worked.",
       lead: "A pilot that failed is a result. Hiding it would make the successes worth less, and would leave the next department to make the same mistake at its own expense.",
+      pilotsFinishedMark: 'PILOTS FINISHED',
       figurePilots: "Pilots finished",
       notYetDecided: "Not yet decided",
       shape: {

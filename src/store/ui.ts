@@ -1,19 +1,20 @@
 import { create } from 'zustand';
 import type { ScenarioId } from '@/mocks/scenarios';
+import type { LanguageCode } from '@/i18n/languages';
 
 /**
  * True client state only. Everything the server owns lives in TanStack Query.
  * Nothing here is persisted — PRAYOG uses no browser storage API.
  */
 interface UiState {
-  locale: 'en' | 'hi';
+  locale: LanguageCode;
   sidebarOpen: boolean;
   dockOpen: boolean;
   paletteOpen: boolean;
   activeCaseId: string | null;
   scenario: ScenarioId;
   toasts: { id: number; tone: 'verify' | 'hold' | 'seal'; message: string; detail?: string }[];
-  setLocale: (locale: 'en' | 'hi') => void;
+  setLocale: (locale: LanguageCode) => void;
   toggleSidebar: () => void;
   setDockOpen: (open: boolean) => void;
   setPaletteOpen: (open: boolean) => void;

@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LEGAL_DOCUMENTS, legalDocument, legalPath, type Bilingual } from '@/config/legal';
+import { LEGAL_DOCUMENTS, legalDocument, legalPath, type Localised } from '@/config/legal';
+import { readingLanguage } from '@/i18n/languages';
 import { useActiveAnchor } from '@/lib/inview';
 import { usePortalLink } from '@/lib/portal';
 import { day } from '@/lib/format';
@@ -24,8 +25,8 @@ export default function Legal() {
   const link = usePortalLink();
 
   const doc = legalDocument(id);
-  const hindi = i18n.language.startsWith('hi');
-  const say = (b: Bilingual): string => (hindi ? b.hi : b.en);
+  const lang = readingLanguage(i18n.language);
+  const say = (b: Localised): string => b[lang];
 
   // The rail has to be built before the early return, so the hook count is
   // stable whether or not the route names a document that exists.

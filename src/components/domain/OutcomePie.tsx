@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { percent } from '@/lib/format';
 
 export type OutcomeKey = 'validated' | 'validated_with_qualifications' | 'not_validated';
@@ -128,6 +129,7 @@ export function OutcomeMark({ outcome, size = 20 }: { outcome: OutcomeKey; size?
  */
 export function OutcomePie({ slices, size = 260 }: { slices: readonly OutcomeSlice[]; size?: number }) {
   const gradId = useId();
+  const { t } = useTranslation();
   const total = slices.reduce((sum, s) => sum + s.count, 0);
 
   if (total === 0) {
@@ -292,7 +294,7 @@ export function OutcomePie({ slices, size = 260 }: { slices: readonly OutcomeSli
             textAnchor="middle"
             style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.075em', fill: 'var(--ink-soft)' }}
           >
-            PILOTS FINISHED
+            {t('pubResults.results.pilotsFinishedMark')}
           </text>
         </svg>
       </div>

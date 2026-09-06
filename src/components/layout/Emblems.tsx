@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { readingLanguage } from '@/i18n/languages';
 
 /**
  * The government identity a procurement portal carries.
@@ -167,6 +168,29 @@ export function StateEmblem({ size = 38 }: { size?: number }) {
 /* ----------------------------------------------------------------- lockups */
 
 /**
+ * What each mark is called, in the language being read.
+ *
+ * A table rather than a ternary. These are not translations of one another —
+ * the state government's own name in Marathi is महाराष्ट्र शासन, which is what is
+ * printed on its stationery, and it is not the Hindi महाराष्ट्र सरकार rendered in a
+ * different font. The Union's name happens to be written the same way in both
+ * Devanagari languages, and that is a fact about the two names rather than a
+ * reason to derive one from the other.
+ */
+const LOCKUP: Record<'india' | 'maharashtra', Record<string, string>> = {
+  india: {
+    en: 'Government of India',
+    hi: 'भारत सरकार',
+    mr: 'भारत सरकार',
+  },
+  maharashtra: {
+    en: 'Government of Maharashtra',
+    hi: 'महाराष्ट्र शासन',
+    mr: 'महाराष्ट्र शासन',
+  },
+};
+
+/**
  * भारत सरकार / Government of India, beside the national flag.
  *
  * One line, in the language being read — a masthead that says the same thing
@@ -175,13 +199,13 @@ export function StateEmblem({ size = 38 }: { size?: number }) {
  */
 export function GovernmentOfIndia({ size = 34, tone = 'deep' }: { size?: number; tone?: 'deep' | 'paper' }) {
   const { i18n } = useTranslation();
-  const hindi = i18n.language.startsWith('hi');
+  const lang = readingLanguage(i18n.language);
   const ink = tone === 'deep' ? 'var(--deep-ink)' : 'var(--ink)';
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <Tricolour height={size * 0.62} />
       <span className="truncate text-micro font-semibold" style={{ color: ink }}>
-        {hindi ? 'भारत सरकार' : 'Government of India'}
+        {LOCKUP.india[lang] ?? LOCKUP.india.en}
       </span>
     </span>
   );
@@ -189,13 +213,13 @@ export function GovernmentOfIndia({ size = 34, tone = 'deep' }: { size?: number;
 
 export function GovernmentOfMaharashtra({ size = 34, tone = 'deep' }: { size?: number; tone?: 'deep' | 'paper' }) {
   const { i18n } = useTranslation();
-  const hindi = i18n.language.startsWith('hi');
+  const lang = readingLanguage(i18n.language);
   const ink = tone === 'deep' ? 'var(--deep-ink)' : 'var(--ink)';
   const dim = tone === 'deep' ? 'var(--deep-dim)' : 'var(--ink-soft)';
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <span className="truncate text-micro font-semibold" style={{ color: ink }}>
-        {hindi ? 'महाराष्ट्र शासन' : 'Government of Maharashtra'}
+        {LOCKUP.maharashtra[lang] ?? LOCKUP.maharashtra.en}
       </span>
       <Emblem slot="maharashtra" size={size} fallback={<StatePlate size={size} tone={dim} />} />
     </span>

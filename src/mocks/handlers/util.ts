@@ -7,6 +7,8 @@ import { scenario, scenarioDelay } from '../scenarios';
 import { getDb } from '../store/db';
 import { currentRole } from '../store/session';
 import { localise } from '../content/localise';
+import { hasContentDictionary } from '@/content/dictionary';
+import { DEFAULT_LANGUAGE, readingLanguage, type LanguageCode } from '@/i18n/languages';
 
 export function servedAt(): string {
   const now = getDb().now();
@@ -23,13 +25,13 @@ export function servedAt(): string {
  * fetch wrapper is the only caller, it always sets the header, and the last
  * value it set is what the response being built right now belongs to.
  */
-let askedFor = 'en';
+let askedFor: LanguageCode = DEFAULT_LANGUAGE;
 export function rememberLanguage(header: string | null): void {
-  askedFor = header?.toLowerCase().startsWith('hi') ? 'hi' : 'en';
+  askedFor = readingLanguage(header);
 }
 
 export function ok<T>(data: T, message?: string): Response {
-  const served: T = askedFor === 'hi' ? localise(data) : data;
+  const served: T = hasContentDictionary(askedFor) ? localise(data, askedFor) : data;
   const body: ApiSuccess<T> = { success: true, data: served, servedAt: servedAt(), ...(message ? { message } : {}) };
   return HttpResponse.json(body, { status: 200 });
 }

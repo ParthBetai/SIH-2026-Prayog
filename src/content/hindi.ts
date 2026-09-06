@@ -324,12 +324,96 @@ const PROGRAMME: Record<string, string> = {
   Public: 'आम नागरिक',
 };
 
+
+/* --------------------------------------------------- the nine stages, in prose
+ *
+ * What happens at each stage and what it produces, for a department and for a
+ * startup. Read out of `src/config/stages.ts` by the component that draws them
+ * and translated at render through `useSay()`, the same way gate names and
+ * stage titles are.
+ */
+const STAGE_PROSE: Record<string, string> = {
+  'You describe the operational problem, measure what it costs today, and turn it into an outcome someone else could be paid to achieve.':
+    'आप परिचालन समस्या का वर्णन करते हैं, आज उसकी लागत मापते हैं, और उसे ऐसे परिणाम में बदलते हैं जिसे प्राप्त करने के लिए किसी और को भुगतान किया जा सके।',
+  'A baseline, an outcome KPI, a budget head and a draft challenge.':
+    'एक आधाररेखा, एक परिणाम KPI, एक बजट शीर्ष और एक प्रारूप चुनौती।',
+  'Nothing yet. The department is still deciding whether the problem is real and funded.':
+    'अभी कुछ नहीं। विभाग अभी यही तय कर रहा है कि समस्या वास्तविक और वित्तपोषित है या नहीं।',
+  'No public record until gate 1 clears.':
+    'द्वार 1 पार होने तक कोई सार्वजनिक अभिलेख नहीं।',
+  'The programme unit checks that you have asked for an outcome, not named a product.':
+    'कार्यक्रम इकाई जाँचती है कि आपने कोई परिणाम माँगा है, किसी उत्पाद का नाम नहीं लिया है।',
+  'A published challenge with a rubric, an IP position and a data annexure.':
+    'मानदंड, IP स्थिति और डेटा अनुबंध सहित एक प्रकाशित चुनौती।',
+  'The challenge appears on the demand board with its budget, deadline and evaluation rubric in the open.':
+    'चुनौती माँग पटल पर अपने बजट, समय-सीमा और मूल्यांकन मानदंड के साथ खुले में दिखती है।',
+  'A public challenge you can read in full before deciding to spend a week on it.':
+    'एक सार्वजनिक चुनौती, जिसे आप उस पर सप्ताह भर लगाने का निर्णय लेने से पहले पूरा पढ़ सकते हैं।',
+  'Applications arrive. You answer clarification questions in public, within the configured window.':
+    'आवेदन आते हैं। आप स्पष्टीकरण प्रश्नों का उत्तर निर्धारित अवधि के भीतर, सार्वजनिक रूप से देते हैं।',
+  'An applicant pool and a published clarification record.':
+    'एक आवेदक समूह और एक प्रकाशित स्पष्टीकरण अभिलेख।',
+  'You check eligibility against your verified profile before writing anything, then apply in six steps with autosave.':
+    'कुछ भी लिखने से पहले आप अपनी सत्यापित प्रोफ़ाइल के विरुद्ध पात्रता जाँचते हैं, फिर स्वतः-सहेजन के साथ छह चरणों में आवेदन करते हैं।',
+  'A submitted application with a reference number and a timestamped receipt.':
+    'संदर्भ संख्या और समय-अंकित रसीद सहित एक प्रस्तुत आवेदन।',
+  'Rules run automatically against verified facts. Anything the engine cannot decide goes to a human, who must write down why.':
+    'नियम सत्यापित तथ्यों पर स्वतः चलते हैं। जो इंजन तय नहीं कर पाता वह मनुष्य के पास जाता है, जिसे कारण लिखना होता है।',
+  'An eligibility ledger with a result, evidence and a citation per rule.':
+    'प्रत्येक नियम के लिए परिणाम, साक्ष्य और उद्धरण सहित एक पात्रता बही।',
+  'You see exactly which rule you passed or failed, the evidence used and the rule cited.':
+    'आप ठीक-ठीक देखते हैं कि आप कौन-सा नियम पार कर पाए या नहीं, कौन-सा साक्ष्य प्रयुक्त हुआ और कौन-सा नियम उद्धृत हुआ।',
+  'A written eligibility outcome. Never a silent rejection.':
+    'एक लिखित पात्रता परिणाम। कभी भी मौन अस्वीकृति नहीं।',
+  'Evaluators declare conflicts before they can open a proposal, then score against the published rubric with a written reason per criterion.':
+    'मूल्यांकनकर्ता प्रस्ताव खोलने से पहले हितों का टकराव घोषित करते हैं, फिर प्रकाशित मानदंड पर प्रत्येक कसौटी के लिए लिखित कारण सहित अंक देते हैं।',
+  'Scores, rationales, variance flags and signed evaluation minutes.':
+    'अंक, तर्क, विचलन संकेत और हस्ताक्षरित मूल्यांकन कार्यवृत्त।',
+  'You are scored against the same rubric you read before applying. Nothing is added afterwards.':
+    'आपको उसी मानदंड पर अंक मिलते हैं जिसे आपने आवेदन से पहले पढ़ा था। बाद में कुछ नहीं जोड़ा जाता।',
+  'A result you can trace back to specific criteria.':
+    'ऐसा परिणाम जिसे आप विशिष्ट कसौटियों तक वापस जोड़ सकते हैं।',
+  'You agree scope, milestones, acceptance tests, data tier and payment per milestone before work starts.':
+    'काम शुरू होने से पहले आप कार्यक्षेत्र, मील-पत्थर, स्वीकृति परीक्षण, डेटा स्तर और प्रति मील-पत्थर भुगतान तय करते हैं।',
+  'A signed pilot agreement with an acceptance test attached to every rupee.':
+    'एक हस्ताक्षरित पायलट अनुबंध, जिसमें हर रुपये के साथ एक स्वीकृति परीक्षण जुड़ा है।',
+  'You read the clauses in plain language first, then the legal text, then sign in two steps.':
+    'आप पहले सरल भाषा में कलम पढ़ते हैं, फिर विधिक पाठ, फिर दो चरणों में हस्ताक्षर करते हैं।',
+  'A countersigned contract and a milestone schedule you can plan against.':
+    'एक प्रति-हस्ताक्षरित अनुबंध और एक मील-पत्थर अनुसूची जिसके अनुसार आप योजना बना सकते हैं।',
+  'Evidence arrives against each milestone. You accept, return or reject it, explicitly, within the review window.':
+    'प्रत्येक मील-पत्थर के विरुद्ध साक्ष्य आते हैं। आप समीक्षा अवधि के भीतर उन्हें स्पष्ट रूप से स्वीकार करते, लौटाते या अस्वीकार करते हैं।',
+  'Accepted milestones, KPI readings, a risk register and an incident log.':
+    'स्वीकृत मील-पत्थर, KPI पाठ, एक जोखिम रजिस्टर और एक घटना लॉग।',
+  'You submit evidence, and the payment clock starts the moment a milestone is accepted — visibly.':
+    'आप साक्ष्य प्रस्तुत करते हैं, और मील-पत्थर स्वीकृत होते ही भुगतान घड़ी चल पड़ती है — दिखाई देते हुए।',
+  'Milestone acceptances and payment claims with an ageing clock anyone can see.':
+    'मील-पत्थर स्वीकृतियाँ और भुगतान दावे, ऐसी आयु-घड़ी के साथ जिसे कोई भी देख सकता है।',
+  'Someone outside the department re-derives the numbers from the raw records and reports against every success criterion.':
+    'विभाग के बाहर का कोई व्यक्ति कच्चे अभिलेखों से आँकड़े दुबारा निकालता है और प्रत्येक सफलता कसौटी के विरुद्ध प्रतिवेदन देता है।',
+  'A hashed, published validation report, including where the pilot fell short.':
+    'एक हैश-युक्त, प्रकाशित सत्यापन प्रतिवेदन, जिसमें यह भी कि पायलट कहाँ कम पड़ा।',
+  'Your claimed outcome is checked against raw data. A validated result becomes a verifiable reference.':
+    'आपका दावा किया गया परिणाम कच्चे आँकड़ों से जाँचा जाता है। सत्यापित परिणाम एक जाँचने योग्य संदर्भ बन जाता है।',
+  'An independently validated deployment record.':
+    'एक स्वतंत्र रूप से सत्यापित तैनाती अभिलेख।',
+  'A successful pilot is not a purchase. You choose a procurement pathway and justify it against the rule that permits it.':
+    'सफल पायलट कोई खरीद नहीं है। आप एक खरीद मार्ग चुनते हैं और उसे अनुमति देने वाले नियम के विरुद्ध उसका औचित्य देते हैं।',
+  'A pathway note, a value-for-money analysis and a replication package other departments can use.':
+    'एक मार्ग टिप्पणी, एक मूल्य-बनाम-धन विश्लेषण और एक पुनरावृत्ति संकुल जिसे अन्य विभाग उपयोग कर सकें।',
+  'You learn the pathway and the authority deciding it, with an indicative timeline.':
+    'आपको मार्ग और उसे तय करने वाले प्राधिकारी की जानकारी मिलती है, एक सांकेतिक समय-रेखा सहित।',
+  'A procurement decision with reasons, published either way.':
+    'कारणों सहित एक खरीद निर्णय, परिणाम चाहे जो हो, प्रकाशित।',
+};
+
 /**
  * One flat table. Built once at module load, because the localiser walks every
  * string in every response and a chain of six lookups per string is six times
  * the work for no benefit.
  */
 export const HINDI: Readonly<Record<string, string>> = Object.freeze({
+  ...STAGE_PROSE,
   ...PLACES,
   ...DEPARTMENTS,
   ...SECTORS,

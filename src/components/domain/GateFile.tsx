@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSay } from '@/lib/contentText';
+import { dayShort } from '@/lib/format';
 import { GATES } from '@/config/gates';
 
 /**
@@ -30,11 +32,18 @@ export interface GateFileProps {
 
 type Row = { id: string; name: string; state: 'cleared' | 'open' | 'ahead' };
 
-/** Dates are demonstration seed values, so they live with the fixture clock. */
-const CLEARED_ON = ['12 Jun', '28 Jun', '19 Jul'];
+/**
+ * Dates are demonstration seed values, so they live with the fixture clock.
+ *
+ * Held as dates rather than as the strings '12 Jun', '28 Jun', '19 Jul', which
+ * is what they used to be: a typed-in English date does not become Marathi when
+ * the reader does, and this sits in the hero of the front page.
+ */
+const CLEARED_ON = ['2026-06-12', '2026-06-28', '2026-07-19'];
 
 export function GateFile({ at = 3, caseId, title, district }: GateFileProps) {
   const say = useSay();
+  const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState<{ x: number; y: number } | null>(null);
 
@@ -77,12 +86,12 @@ export function GateFile({ at = 3, caseId, title, district }: GateFileProps) {
     <div ref={ref} className="file">
       {/* One sentence carries the whole drawing for a screen reader. */}
       <p className="sr-only">
-        {title ? `${title}. ` : ''}This case has cleared {at} of {GATES.length} gates. It is standing on gate {at},{' '}
-        {say(GATES[at]?.name ?? '')}. Each gate is a written decision with an owner and a date.
+        {title ? `${title}. ` : ''}
+        {t('gateFile.summary', { cleared: at, total: GATES.length, at, gate: say(GATES[at]?.name ?? '') })}
       </p>
 
       <div aria-hidden className="file-body" style={style}>
-        <span className="file-tab px-3 py-1 text-micro font-semibold text-deep">Open case</span>
+        <span className="file-tab px-3 py-1 text-micro font-semibold text-deep">{t('gateFile.openCase')}</span>
 
         {/* The cover. */}
         <div className="border-b border-deep-rule px-4 pb-4 pt-6">
@@ -104,13 +113,13 @@ export function GateFile({ at = 3, caseId, title, district }: GateFileProps) {
               <span className="truncate text-label">{r.name}</span>
               {r.state === 'cleared' ? (
                 <span className="flex items-center gap-2">
-                  <span className="type-register text-micro text-deep-dim">{CLEARED_ON[i] ?? ''}</span>
+                  <span className="type-register text-micro text-deep-dim">{CLEARED_ON[i] ? dayShort(CLEARED_ON[i]) : ''}</span>
                   <span className="file-seal text-micro">✓</span>
                 </span>
               ) : r.state === 'open' ? (
                 <span className="flex items-center gap-2">
                   <span className="file-open-dot" />
-                  <span className="text-micro font-semibold uppercase tracking-stamp text-saffron">Open</span>
+                  <span className="text-micro font-semibold uppercase tracking-stamp text-saffron">{t('gate.open')}</span>
                 </span>
               ) : (
                 <span className="text-micro text-deep-dim">—</span>
@@ -120,7 +129,7 @@ export function GateFile({ at = 3, caseId, title, district }: GateFileProps) {
         </ol>
 
         <p className="border-t border-deep-rule px-4 py-3 text-micro text-deep-dim">
-          Every line above has an owner, a written reason and a date. All seven are public.
+          {t('gateFile.footnote')}
         </p>
       </div>
     </div>

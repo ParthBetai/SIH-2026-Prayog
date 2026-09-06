@@ -1,6 +1,6 @@
-# CLAUDE_HANDOFF.md
+# HANDOFF.md
 
-Context handoff for continuing the **PRAYOG** build in a fresh Claude Code session.
+Context handoff for continuing the **PRAYOG** build in a fresh session.
 Working directory: `C:\Users\Parth\Downloads\prayog` (Windows 11, Node v24.19.0, npm 11.17.0, not a git repo).
 Read this file top to bottom before touching anything.
 
@@ -76,7 +76,8 @@ scenario-state sweep in a real browser.
 - `package.json` carries `"allowScripts": { "esbuild": true, "msw": true }`.
   npm 11 blocks postinstall scripts; this is what installs esbuild and the MSW
   worker. **Do not remove.**
-- `.claude/launch.json` exists so `preview_start` can run the dev server.
+- The dev server is plain `npm run dev` on port 5173. No editor- or tool-specific
+  launch configuration is committed.
 
 ### What exists
 
@@ -1097,7 +1098,7 @@ None.
 
 ---
 
-## 9. INSTRUCTIONS FOR THE NEXT CLAUDE
+## 9. INSTRUCTIONS FOR WHOEVER PICKS THIS UP
 
 **Understand immediately**
 - The build is **complete, verified and running**. All 55 pages exist across six portals; typecheck and lint are clean; the production build succeeds; every route has been walked in a browser at four viewport widths; every scenario has been exercised; the demo runs end to end. What remains is listed in §8, and none of it blocks a handover.

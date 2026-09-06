@@ -1,5 +1,5 @@
 /**
- * Every `t('key')` in the product resolves to a real string, in both languages.
+ * Every `t('key')` in the product resolves to a real string, in every language.
  *
  * A missing key does not throw: i18next falls back to English and, failing
  * that, prints the key itself. So a half-finished translation looks like a
@@ -9,7 +9,7 @@
  * It also catches the opposite: a key in the bundles that nothing calls, which
  * is dead weight the next translator would waste time on.
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -63,8 +63,33 @@ function keysOf(file) {
   return found;
 }
 
-const en = keysOf(join(SRC, 'i18n', 'en.ts'));
-const hi = keysOf(join(SRC, 'i18n', 'hi.ts'));
+/*
+ * Read the languages from the list the product itself runs on, rather than
+ * from a pair of names hard-coded here. A language added to
+ * `src/i18n/languages.ts` is checked from the moment its bundle lands — and one
+ * added there WITHOUT a bundle fails here, which is the error you want rather
+ * than a product that quietly serves English under a Marathi label.
+ */
+const LANGUAGES = [
+  ...readFileSync(join(SRC, 'i18n', 'languages.ts'), 'utf8').matchAll(/^\s*\{ code: '([a-z]+)'/gm),
+].map((m) => m[1]);
+const SOURCE = 'en';
+
+if (!LANGUAGES.includes(SOURCE)) {
+  console.error('\ncheck-i18n: could not read the language list from src/i18n/languages.ts\n');
+  process.exit(1);
+}
+
+const bundles = new Map();
+for (const code of LANGUAGES) {
+  const file = join(SRC, 'i18n', `${code}.ts`);
+  if (!existsSync(file)) {
+    console.error(`\ncheck-i18n: '${code}' is in LANGUAGES but src/i18n/${code}.ts does not exist\n`);
+    process.exit(1);
+  }
+  bundles.set(code, keysOf(file));
+}
+const en = bundles.get(SOURCE);
 
 /** Plural keys are declared as `x_one`/`x_other` and called as `x`. */
 const resolves = (bundle, key) =>
@@ -97,7 +122,6 @@ for (const file of walk(SRC)) {
 }
 
 const missingEn = [...used].filter(([k]) => !resolves(en, k));
-const missingHi = [...used].filter(([k]) => resolves(en, k) && !resolves(hi, k));
 
 let bad = false;
 
@@ -108,18 +132,22 @@ if (missingEn.length > 0) {
   if (missingEn.length > 40) console.error(`  ... and ${missingEn.length - 40} more`);
 }
 
-if (missingHi.length > 0) {
+for (const code of LANGUAGES) {
+  if (code === SOURCE) continue;
+  const bundle = bundles.get(code);
+  const missing = [...used].filter(([k]) => resolves(en, k) && !resolves(bundle, k));
+  if (missing.length === 0) continue;
   bad = true;
-  console.error(`\ncheck-i18n: ${missingHi.length} key(s) in en.ts with no Hindi\n`);
-  for (const [key, file] of missingHi.slice(0, 40)) console.error(`  ${key}  —  ${file}`);
-  if (missingHi.length > 40) console.error(`  ... and ${missingHi.length - 40} more`);
+  console.error(`\ncheck-i18n: ${missing.length} key(s) in en.ts with no ${code}\n`);
+  for (const [key, file] of missing.slice(0, 40)) console.error(`  ${key}  —  ${file}`);
+  if (missing.length > 40) console.error(`  ... and ${missing.length - 40} more`);
 }
 
 if (bad) {
-  console.error('\nA missing key renders as the key itself. Add it to both bundles.\n');
+  console.error('\nA missing key renders as the key itself. Add it to every bundle.\n');
   process.exit(1);
 }
 
 console.log(
-  `check-i18n: clean — ${used.size} keys called, all present in English and Hindi (${en.size} declared).`,
+  `check-i18n: clean — ${used.size} keys called, all present in ${LANGUAGES.join(', ')} (${en.size} declared).`,
 );
