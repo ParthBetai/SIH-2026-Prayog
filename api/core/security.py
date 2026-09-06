@@ -41,25 +41,9 @@ async def get_current_user(
         )
 
     token = credentials.credentials
+    supabase = get_supabase_client()
     admin_supabase = get_supabase_admin_client()
 
-    # Handle demonstration token shortcut (demo_<role>_<id>)
-    if token.startswith("demo_"):
-        parts = token.split("_")
-        role_str = parts[1].upper() if len(parts) > 1 else "GOVERNMENT"
-        demo_id = parts[2] if len(parts) > 2 else "00000000-0000-0000-0000-000000000001"
-        return CurrentUser(
-            id=demo_id,
-            email=f"{role_str.lower()}@nexus.gov.in",
-            role=UserRole(role_str) if role_str in UserRole._value2member_map_ else UserRole.GOVERNMENT,
-            full_name=f"Demonstration {role_str.capitalize()}",
-            department_name="Ministry of Innovation & Technology" if role_str == "GOVERNMENT" else None,
-            dpiit_number="DPIIT-DEMO-9999" if role_str == "STARTUP" else None,
-            tech_tags=["AI/ML", "GovTech", "Cloud", "IoT", "CleanTech"],
-            is_verified=True,
-        )
-
-    supabase = get_supabase_client()
     try:
         # Validate JWT token with Supabase Auth
         auth_response = supabase.auth.get_user(token)
@@ -70,8 +54,6 @@ async def get_current_user(
                 headers={"WWW-Authenticate": "Bearer"},
             )
         auth_user = auth_response.user
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -130,20 +112,6 @@ def require_role(*allowed_roles: UserRole):
         return current_user
 
     return role_checker
-
-
-async def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
-) -> Optional[CurrentUser]:
-    """
-    Retrieves the current user if a valid token is provided; otherwise returns None without raising 401.
-    """
-    if not credentials or not credentials.credentials:
-        return None
-    try:
-        return await get_current_user(credentials)
-    except Exception:
-        return None
 
 
 # Convenient role shortcut dependencies

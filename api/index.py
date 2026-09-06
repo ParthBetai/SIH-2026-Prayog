@@ -1,22 +1,7 @@
-import sys
-from pathlib import Path
-
-# Add project root and api directory to sys.path for Vercel serverless runtime
-_ROOT_DIR = Path(__file__).resolve().parent.parent
-_API_DIR = Path(__file__).resolve().parent
-for _path in (str(_ROOT_DIR), str(_API_DIR)):
-    if _path not in sys.path:
-        sys.path.insert(0, _path)
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-try:
-    from api.core.config import get_settings
-    from api.routes import auth, challenges, pilots, validation
-except ImportError:
-    from core.config import get_settings
-    from routes import auth, challenges, pilots, validation
+from api.core.config import get_settings
+from api.routes import auth, challenges, pilots, validation
 
 settings = get_settings()
 
