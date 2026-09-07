@@ -2,20 +2,17 @@ import type { ReactNode } from 'react';
 import { useSay } from '@/lib/contentText';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { AccountOnlyLink } from '@/components/layout/AccountOnlyLink';
 import { CardCarousel } from '@/components/patterns/CardCarousel';
 import { STAGES } from '@/config/stages';
-import { useChallenges, useResults, useTransparency } from '@/services/hooks';
+import { useResults, useTransparency, type TransparencyPayload } from '@/services/hooks';
 import { QueryState, WidgetBoundary } from '@/components/layout/QueryState';
 import { FreshnessLine } from '@/components/layout/Shell';
-import { StatSkeleton, TableSkeleton } from '@/components/ui/Feedback';
-import { Badge } from '@/components/ui/Badge';
+import { StatSkeleton } from '@/components/ui/Feedback';
 import { GateFile } from '@/components/domain/GateFile';
-import { SlaClock } from '@/components/domain/SlaClock';
-import { ChallengeCard } from '@/components/domain/ChallengeCard';
 import { OutcomePie } from '@/components/domain/OutcomePie';
 import { useReveal } from '@/lib/reveal';
-import { daysBetween, money, moneyScaled, num } from '@/lib/format';
-import type { Challenge } from '@/types/models';
+import { moneyScaled, num } from '@/lib/format';
 
 
 function Eyebrow({ children, tone = 'deep' }: { children: ReactNode; tone?: 'deep' | 'paper' }) {
@@ -33,14 +30,10 @@ export default function DemandBoard() {
   const say = useSay();
   const { t } = useTranslation();
   const stats = useTransparency();
-  const challenges = useChallenges({ view: 'public', status: ['open', 'closing_soon'], sort: 'closing' });
   const results = useResults();
 
-  useReveal([stats.data, challenges.data, results.data]);
+  useReveal([stats.data, results.data]);
 
-  const open = challenges.data?.data ?? [];
-  const notice = open[0];
-  const rest = open.slice(1);
   const h = stats.data?.data.headline;
 
   return (
@@ -64,10 +57,10 @@ export default function DemandBoard() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
-                href="#demand-heading"
+                href="#money-heading"
                 className="press inline-flex h-12 items-center rounded-pill bg-saffron px-6 text-body font-semibold text-deep no-underline shadow-saffron"
               >
-                {t('pubStatic.demand.browseOpen')}
+                {t('pubStatic.demand.seeTheMoney')}
               </a>
               <Link
                 to="/how-it-works"
@@ -81,7 +74,7 @@ export default function DemandBoard() {
               <dl className="mt-10 grid max-w-[540px] grid-cols-3 gap-px overflow-hidden rounded-block border border-deep-rule bg-deep-rule">
                 {[
                   { k: t('pubStatic.demand.statDepartments'), v: num(h.departments), c: 'text-deep-ink' },
-                  { k: t('pubStatic.demand.statOpenNow'), v: num(h.openProblems), c: 'text-saffron' },
+                  { k: t('pubStatic.demand.statDistricts'), v: num(h.districts), c: 'text-saffron' },
                   { k: t('pubStatic.demand.statCommitted'), v: moneyScaled(h.committedPaise), c: 'text-signal' },
                 ].map((s) => (
                   <div key={s.k} className="bg-deep-2 px-4 py-4">
@@ -102,68 +95,47 @@ export default function DemandBoard() {
             claim, and the only one this page is entitled to make.
           */}
           <figure className="m-0 lg:pl-6">
-            <GateFile at={3} caseId={notice?.caseId} title={notice?.title} district={notice?.district} />
+            <GateFile at={3} />
+            <figcaption className="mt-4 max-w-[46ch] text-micro text-deep-dim">
+              {t('pubStatic.demand.workedExample')}
+            </figcaption>
           </figure>
         </div>
       </section>
 
-      {/* ============================================== 3. the featured case */}
-      <section aria-labelledby="notice-heading" className="full-bleed bg-sheet px-4 py-16 md:px-6">
+      {/* ============================================== 3. where the money goes
+        The homepage of a procurement programme has one obligation to a reader
+        who will never apply for anything: say what has been committed in their
+        name, and how long the state takes to pay against evidence. Both are
+        aggregate. Nothing here names a case, a department's current position,
+        or anything a signed-out visitor is not entitled to.
+      */}
+      <section aria-labelledby="money-heading" className="full-bleed bg-sheet px-4 py-16 md:px-6">
         <div className="mx-auto max-w-shell">
-          <Eyebrow tone="paper">{t('pubStatic.demand.closingSoonest')}</Eyebrow>
-          <WidgetBoundary label="the featured challenge">
-            <QueryState
-              query={challenges}
-              errorTitle={t('pubStatic.demand.challengesErrorTitle')}
-              loading={<div className="h-[300px] rounded-block bg-ledger" />}
-              isEmpty={(d) => d.data.length === 0}
-              empty={{
-                title: t('pubStatic.demand.featuredEmptyTitle'),
-                body: t('pubStatic.demand.featuredEmptyBody'),
-                action: { label: t('pubStatic.demand.seeResults'), to: '/results' },
-              }}
+          <Eyebrow tone="paper">{t('pubStatic.demand.moneyEyebrow')}</Eyebrow>
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <h2 id="money-heading" className="max-w-[20ch] font-display text-hero text-ink">
+              {t('pubStatic.demand.moneyHeading')}
+            </h2>
+            <AccountOnlyLink
+              to="/transparency"
+              className="text-label text-ink underline underline-offset-4 hover:text-verify"
             >
-              {() => (notice ? <FeaturedNotice notice={notice} headingId="notice-heading" /> : <span />)}
-            </QueryState>
-          </WidgetBoundary>
-        </div>
-      </section>
-
-      {/* ============================================== 4. everything else open */}
-      <section aria-labelledby="demand-heading" className="full-bleed border-t border-rule bg-ledger px-4 py-16 md:px-6">
-        <div className="mx-auto max-w-shell">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <Eyebrow tone="paper">{t('pubStatic.demand.boardEyebrow')}</Eyebrow>
-              <h2 id="demand-heading" className="font-display text-hero text-ink">
-                {t('pubStatic.demand.boardHeading')}
-              </h2>
-            </div>
+              {t('pubStatic.demand.moneyLink')}
+            </AccountOnlyLink>
           </div>
 
-          <WidgetBoundary label="the demand board">
+          <WidgetBoundary label={t('pubStatic.demand.moneyBoundary')}>
             <QueryState
-              query={challenges}
-              errorTitle={t('pubStatic.demand.challengesErrorTitle')}
-              loading={<TableSkeleton rows={6} columns={4} />}
-              isEmpty={(d) => d.data.length === 0}
-              empty={{
-                title: t('pubStatic.demand.boardEmptyTitle'),
-                body: t('pubStatic.demand.boardEmptyBody'),
-                action: { label: t('pubStatic.demand.seeResults'), to: '/results' },
-              }}
+              query={stats}
+              errorTitle={t('pubStatic.demand.moneyErrorTitle')}
+              loading={<StatSkeleton rows={2} />}
             >
-              {() => (
-                <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {rest.map((c, i) => (
-                    <li key={c.id} className="reveal" data-delay={String((i % 5) + 1)}>
-                      <ChallengeCard challenge={c} />
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {(payload) => <MoneyPanel payload={payload.data} />}
             </QueryState>
           </WidgetBoundary>
+
+          <p className="mt-8 max-w-doc text-body text-ink-soft">{t('pubStatic.demand.moneyNote')}</p>
         </div>
       </section>
 
@@ -229,7 +201,7 @@ export default function DemandBoard() {
                       <span className="sr-only">{t('pubStatic.demand.srStage', { index: stage.index })} </span>
                       {say(stage.title)}
                     </h3>
-                    <p className="mt-3 text-body text-deep-dim">{stage.department.happens}</p>
+                    <p className="mt-3 text-body text-deep-dim">{say(stage.department.happens)}</p>
 
                     <p className="field-label mt-auto pt-6 !text-deep-dim">
                       {t('pubStatic.demand.stageActorGate', { actor: say(stage.actor), gate: stage.gate })}
@@ -250,9 +222,9 @@ export default function DemandBoard() {
             <h2 id="proof-heading" className="max-w-[18ch] font-display text-hero text-ink">
               {t('pubStatic.demand.proofHeading')}
             </h2>
-            <Link to="/results" className="text-label text-ink underline underline-offset-4 hover:text-verify">
+            <AccountOnlyLink to="/results" className="text-label text-ink underline underline-offset-4 hover:text-verify">
               {t('pubStatic.demand.readEveryResult')}
-            </Link>
+            </AccountOnlyLink>
           </div>
 
           <WidgetBoundary label="the published results">
@@ -264,7 +236,10 @@ export default function DemandBoard() {
               empty={{
                 title: t('pubStatic.demand.proofEmptyTitle'),
                 body: t('pubStatic.demand.proofEmptyBody'),
-                action: { label: t('pubStatic.demand.seeOpenChallenges'), to: '/challenges' },
+                /* Not the challenge register: it needs an account, and an empty
+                   state that offers a locked door is worse than one that offers
+                   nothing. How-it-works is open to anyone. */
+                action: { label: t('pubStatic.demand.learnHowItWorks'), to: '/how-it-works' },
               }}
             >
               {(payload) => <ProofWall rows={payload.data} />}
@@ -310,99 +285,6 @@ export default function DemandBoard() {
 
 /* ------------------------------------------------------- featured notice */
 
-function FeaturedNotice({ notice, headingId }: { notice: Challenge; headingId: string }) {
-  const { t } = useTranslation();
-  return (
-    <article className="overflow-hidden rounded-block border border-rule bg-sheet shadow-lift">
-      <div
-        aria-hidden
-        className="h-1 w-full"
-        style={{ background: 'linear-gradient(90deg, var(--verify), transparent)' }}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="px-6 py-8 lg:px-10 lg:py-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="type-register rounded-pill border border-ink px-3 py-0.5 text-micro text-ink">
-              {notice.caseId}
-            </span>
-            <span className="field-label !text-verify">{notice.sector}</span>
-          </div>
-
-          <h2 id={headingId} className="mt-4 max-w-[20ch] font-display text-hero text-ink">
-            {notice.title}
-          </h2>
-
-          <p className="mt-4 max-w-doc text-body text-ink-soft">
-            {t('pubStatic.demand.noticeLead', { district: notice.district, state: notice.state })}
-          </p>
-
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {notice.capabilities.slice(0, 4).map((cap) => (
-              <li key={cap} className="rounded-pill border border-rule bg-ledger px-3 py-1 text-micro text-ink-soft">
-                {cap}
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              to={`/challenges/${notice.slug}`}
-              className="press inline-flex h-11 items-center rounded-pill bg-ink px-6 text-body font-medium text-sheet no-underline"
-            >
-              {t('pubStatic.demand.readChallenge')}
-            </Link>
-            {notice.eligibility.relaxationsAvailable ? (
-              <Badge tone="verify">{t('pubStatic.demand.startupRelief')}</Badge>
-            ) : null}
-          </div>
-        </div>
-
-        {/* The three things a founder decides on, in the order they decide them. */}
-        <dl className="border-t border-rule bg-ledger lg:border-l lg:border-t-0">
-          <div className="border-b border-rule px-6 py-5">
-            <dt className="field-label">{t('pubStatic.demand.measuredOn')}</dt>
-            <dd className="mt-1 text-body text-ink">{notice.baseline.metric}</dd>
-            <dd className="mt-2 flex flex-wrap items-baseline gap-2 font-display text-figure text-ink tnum">
-              {num(notice.baseline.currentValue, 1)}
-              <span aria-hidden className="text-verify">
-                →
-              </span>
-              {num(notice.outcome.magnitude, 1)}
-              <span className="text-body font-normal text-ink-soft">{notice.outcome.unit}</span>
-            </dd>
-          </div>
-          <div className="border-b border-rule px-6 py-5">
-            <dt className="field-label">{t('pubStatic.demand.pilotBudget')}</dt>
-            <dd className="mt-1 font-display text-figure text-ink tnum">
-              {money(notice.pilot.budgetPaise)}
-            </dd>
-            <dd className="mt-1 text-micro text-ink-soft">
-              {t('pubStatic.demand.overDays', { count: notice.pilot.durationDays })}
-            </dd>
-          </div>
-          <div className="px-6 py-5">
-            <dt className="field-label">{t('pubStatic.demand.applicationsClose')}</dt>
-            <dd className="mt-2">
-              {notice.timeline.closesOn && notice.timeline.publishedOn ? (
-                <SlaClock
-                  startedOn={notice.timeline.publishedOn}
-                  limitDays={daysBetween(notice.timeline.publishedOn, notice.timeline.closesOn)}
-                  showDetail
-                />
-              ) : (
-                <span className="text-data text-ink">—</span>
-              )}
-            </dd>
-            <dd className="mt-2 text-micro text-ink-soft tnum">
-              {t('pubStatic.demand.appliedSoFar', { count: notice.applicantCount })}
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </article>
-  );
-}
-
 /* -------------------------------------------------------------- the proof */
 
 /*
@@ -426,6 +308,78 @@ interface ResultRow {
  * and there are only three findings a validator can sign. The list beside it
  * carries the same numbers in words, so the answer survives without colour.
  */
+
+/**
+ * What has been committed, and how fast it is actually paid.
+ *
+ * Two figures, because they answer two different questions and neither answers
+ * the other: the money says how serious the programme is, and the clock says
+ * whether a small supplier can survive taking part in it. The second is the one
+ * a startup asks first and the one a procurement site almost never publishes.
+ *
+ * The bar is decorative and marked so. It is a second reading of the same two
+ * numbers written beneath it, because a rule that carries meaning only in its
+ * colour and its position is unreadable to a good share of the people this
+ * programme exists to reach.
+ */
+function MoneyPanel({ payload }: { payload: TransparencyPayload }) {
+  const { t } = useTranslation();
+  const h = payload.headline;
+  const m = payload.medians;
+
+  /* Over the limit the marker pins to the end and turns, rather than running
+     off the rule. A bar that overflows says less than one that stops. */
+  const over = m.acceptanceToPaymentDays > m.limitDays;
+  const at = Math.min(100, Math.round((m.acceptanceToPaymentDays / Math.max(1, m.limitDays)) * 100));
+
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <div className="rounded-block border border-rule bg-ledger p-6 shadow-sheet md:p-8">
+        <p className="field-label">{t('pubStatic.demand.moneyCommitted')}</p>
+        <p className="mt-2 font-display text-hero tnum text-ink">{moneyScaled(h.committedPaise)}</p>
+        <p className="mt-3 max-w-[34ch] text-body text-ink-soft">
+          {t('pubStatic.demand.moneyReach', {
+            departments: h.departments,
+            districts: h.districts,
+            pilots: h.activePilots,
+          })}
+        </p>
+      </div>
+
+      <div className="rounded-block border border-rule bg-ledger p-6 shadow-sheet md:p-8">
+        <p className="field-label">{t('pubStatic.demand.clockLabel')}</p>
+
+        <div aria-hidden className="relative mt-6 h-2 rounded-pill bg-rule">
+          <span
+            className={['absolute inset-y-0 left-0 block rounded-pill', over ? 'bg-seal' : 'bg-verify'].join(' ')}
+            style={{ width: `${at}%` }}
+          />
+          <span
+            className={[
+              'absolute top-1/2 block h-4 w-4 rounded-pill border border-sheet',
+              over ? 'bg-seal' : 'bg-verify',
+            ].join(' ')}
+            style={{ left: `${at}%`, transform: 'translate(-50%, -50%)' }}
+          />
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
+          <p className={['font-display text-h2 tnum', over ? 'text-seal' : 'text-verify'].join(' ')}>
+            {t('pubStatic.demand.clockMedian', { days: m.acceptanceToPaymentDays })}
+          </p>
+          <p className="text-micro tnum text-ink-soft">
+            {t('pubStatic.demand.clockLimit', { days: m.limitDays })}
+          </p>
+        </div>
+
+        <p className="mt-4 border-t border-rule pt-4 text-body text-ink-soft">
+          {t('pubStatic.demand.clockTimeliness', { percent: m.paymentTimelinessPercent })}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ProofWall({ rows }: { rows: readonly ResultRow[] }) {
   const { t } = useTranslation();
   const count = (key: string): number => rows.filter((r) => (r.outcome ?? 'not_validated') === key).length;
@@ -459,8 +413,7 @@ function ProofWall({ rows }: { rows: readonly ResultRow[] }) {
       <OutcomePie slices={slices} />
 
       <p className="mt-8 border-t border-rule pt-4 text-micro text-ink-soft">
-        Every finding here was signed by someone who does not work for the department that ran the pilot, and who was
-        paid whether the answer was yes or no.
+        {t('pubResults.results.shape.note')}
       </p>
     </div>
   );

@@ -390,12 +390,79 @@ const STAGE_PROSE: Record<string, string> = {
     'कारणांसह खरेदी निर्णय, निकाल काहीही असो, प्रकाशित.',
 };
 
+
+/* ------------------------------------------------ the rest of the seed
+ *
+ * Integration names, screening timeline labels, risk and change-request
+ * titles, KPI names, the solution summary, and the outcome statements whose
+ * wording differs from the problem library above. Every one of these is on
+ * a page a reader opens; none of them had an entry, so they were served in
+ * English under a translated heading.
+ */
+const REMAINING_SEED: Record<string, string> = {
+  'DPIIT / Startup India recognition':
+    'DPIIT / स्टार्टअप इंडिया मान्यता',
+  'Government e-Marketplace':
+    'गव्हर्नमेंट ई-मार्केटप्लेस',
+  'Public Financial Management System':
+    'सार्वजनिक वित्तीय व्यवस्थापन प्रणाली',
+  'Government single sign-on':
+    'शासकीय एकल साइन-ऑन',
+  'Email notification service':
+    'ईमेल सूचना सेवा',
+  'Application submitted':
+    'अर्ज सादर',
+  'Eligible — all rules passed, two relaxations applied':
+    'पात्र — सर्व नियम पूर्ण, दोन सवलती लागू',
+  'Shortlisted at gate 2':
+    'द्वार २ वर निवडसूचीत',
+  'Evaluation complete, ranked first of fourteen':
+    'मूल्यांकन पूर्ण, चौदापैकी प्रथम क्रमांक',
+  'Pilot awarded at gate 3':
+    'द्वार ३ वर प्रायोगिक प्रकल्पाचे कंत्राट',
+  'Draft created from the outcome-based problem statement template.':
+    'निष्पत्ती-आधारित अडचण-कथन नमुन्यावरून मसुदा तयार केला.',
+  'Published after gate 1 cleared.':
+    'द्वार १ पार झाल्यावर प्रकाशित.',
+  'Masked extract query returned more rows than the agreed field list permits':
+    'आच्छादित निष्कर्षण प्रश्नाने ठरलेल्या क्षेत्र-सूचीपेक्षा अधिक ओळी परत केल्या',
+  'Extend the measurement window by three weeks and add two depot sites':
+    'मापन कालावधी तीन आठवड्यांनी वाढवा आणि दोन आगार स्थळे जोडा',
+  'Non-revenue water in the pilot zone':
+    'प्रायोगिक विभागातील बिनमहसुली पाणी',
+  'Crew jobs closed on first visit':
+    'पहिल्याच भेटीत पूर्ण झालेली पथक-कामे',
+  'Acoustic leak localisation for water distribution networks':
+    'पाणी वितरण जाळ्यासाठी ध्वनिक गळती स्थाननिश्चिती',
+  'Permanent acoustic loggers correlated against a pressure model, delivering leak localisation to a 30-metre segment into the existing complaint register.':
+    'दाब प्रारूपाशी सहसंबंधित कायमस्वरूपी ध्वनिक नोंदक, जे सध्याच्या तक्रार नोंदवहीत ३० मीटर टप्प्यापर्यंत गळतीचे स्थान सांगतात.',
+  'Bring unexplained diesel draw down to a level the depot manager can investigate the same week.':
+    'अस्पष्ट डिझेल उपसा अशा पातळीवर आणा की आगार व्यवस्थापक त्याच आठवड्यात त्याची चौकशी करू शकेल.',
+  'Find the child who is about to stop coming, while a teacher can still do something about it.':
+    'जे मूल येणे थांबवणार आहे त्याला शिक्षक अजून काही करू शकत असतानाच शोधा.',
+  'Move the same vehicles through the corridor faster in peak, using the controllers already installed.':
+    'आधीच बसवलेल्या नियंत्रकांनीच, गर्दीच्या वेळी त्याच वाहनांना मार्गिकेतून अधिक वेगाने पुढे न्या.',
+  'Know a light has failed before a resident tells you, and fix it inside a week.':
+    'रहिवाशाने सांगण्यापूर्वीच दिवा बंद पडल्याचे कळू द्या, आणि तो आठवडाभरात दुरुस्त करा.',
+  'Find the assessment gap from imagery, and send a surveyor only where it matters.':
+    'प्रतिमांवरून आकारणीतील तफावत शोधा, आणि सर्वेक्षक फक्त जिथे गरज आहे तिथेच पाठवा.',
+  'Private limited company':
+    'प्रायव्हेट लिमिटेड कंपनी',
+  'Limited liability partnership':
+    'मर्यादित दायित्व भागीदारी',
+  'Registered partnership':
+    'नोंदणीकृत भागीदारी',
+  'Sole proprietorship':
+    'एकल मालकी',
+};
+
 /**
  * One flat table, built once at module load — the localiser walks every string
  * in every response, and a chain of lookups per string would be that work over
  * again for nothing.
  */
 export const MARATHI: Readonly<Record<string, string>> = Object.freeze({
+  ...REMAINING_SEED,
   ...STAGE_PROSE,
   ...PLACES,
   ...DEPARTMENTS,
