@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query';
-import { api, query, type Fetched } from './api';
+import { api, query, setAuthToken, type Fetched } from './api';
 import type {
   Application,
   AuditEvent,
@@ -54,13 +54,21 @@ export function useAccounts(): UseQueryResult<Fetched<User[]>> {
 }
 
 export function useSignIn(): UseMutationResult<
-  Fetched<{ user: User | null }>,
+  Fetched<{ user: User | null; token?: string }>,
   Error,
   { userId?: string; role?: Role; email?: string; password?: string }
 > {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input) => api.post<{ user: User | null }>('/api/auth/login', input),
+    mutationFn: async (input) => {
+      const res = await api.post<{ user: User | null; token?: string }>('/api/auth/login', input);
+      if (res.data?.token) {
+        setAuthToken(res.data.token);
+      } else if (input.role === 'public') {
+        setAuthToken(null);
+      }
+      return res;
+    },
     onSuccess: () => qc.invalidateQueries(),
   });
 }
