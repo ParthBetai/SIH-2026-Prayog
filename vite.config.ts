@@ -54,7 +54,16 @@ const CHART_DEPS = [
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
-  server: { port: 5173, open: false },
+  server: {
+    port: 5173,
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     target: 'es2022',
     cssCodeSplit: true,

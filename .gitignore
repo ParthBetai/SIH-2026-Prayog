@@ -53,3 +53,7 @@ pnpm-debug.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Local Auth Data Store
+api/data/
+
