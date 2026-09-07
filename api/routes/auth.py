@@ -11,9 +11,23 @@ from api.core.security import CurrentUser, Role, generate_initials, get_optional
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-# Local persistence directory for robust fallback and offline development
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+# Local persistence directory for robust fallback and offline development.
+# On serverless platforms (Vercel / AWS Lambda), the deployment root is read-only.
+# We safely use /tmp in serverless environments, or local api/data in standard environments.
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    DATA_DIR = Path("/tmp") / "prayog_data"
+else:
+    DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    DATA_DIR = Path("/tmp") / "prayog_data"
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+
 USERS_FILE = DATA_DIR / "users.json"
 
 # Default seed accounts matching the frontend demonstration accounts
@@ -114,24 +128,33 @@ DEFAULT_ACCOUNTS = [
 ]
 
 
+# In-memory user cache as primary resilient fallback
+_IN_MEMORY_USERS: Dict[str, Dict[str, Any]] = {acc["id"]: acc.copy() for acc in DEFAULT_ACCOUNTS}
+
+
 def load_local_users() -> Dict[str, Dict[str, Any]]:
     if not USERS_FILE.exists():
-        initial = {acc["id"]: acc for acc in DEFAULT_ACCOUNTS}
-        save_local_users(initial)
-        return initial
+        save_local_users(_IN_MEMORY_USERS)
+        return _IN_MEMORY_USERS.copy()
     try:
         with open(USERS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            disk_users = json.load(f)
+            _IN_MEMORY_USERS.update(disk_users)
+            return _IN_MEMORY_USERS.copy()
     except Exception:
-        return {acc["id"]: acc for acc in DEFAULT_ACCOUNTS}
+        return _IN_MEMORY_USERS.copy()
 
 
 def save_local_users(users: Dict[str, Dict[str, Any]]) -> None:
+    _IN_MEMORY_USERS.update(users)
     try:
+        if not DATA_DIR.exists():
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
         with open(USERS_FILE, "w", encoding="utf-8") as f:
             json.dump(users, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        print(f"Warning: Failed to save users locally: {e}")
+    except Exception:
+        # Gracefully continue with in-memory persistence if disk is inaccessible
+        pass
 
 
 def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:

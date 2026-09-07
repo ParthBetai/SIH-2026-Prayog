@@ -206,7 +206,7 @@ export function PasswordStrength({ value, minLength, minClasses }: { value: stri
       </p>
       {v.missing.length > 0 && value.length > 0 ? (
         <ul className="mt-1 list-disc pl-5 text-micro text-ink-soft">
-          {v.missing.map((m) => (
+          {v.missing.map((m: string) => (
             <li key={m}>{t('field.password.needs', { requirement: m })}</li>
           ))}
         </ul>

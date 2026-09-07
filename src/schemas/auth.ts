@@ -15,7 +15,7 @@ const MAX_LENGTH = policy<number>('account.password.maxLength');
 const MIN_CLASSES = policy<number>('account.password.minClasses');
 
 export const PASSWORD_RULE = `At least ${MIN_LENGTH} characters, including ${MIN_CLASSES} of: ${PASSWORD_CLASSES.map(
-  (c) => c.label,
+  (c: { label: string }) => c.label,
 ).join(', ')}.`;
 
 const password = z
@@ -23,7 +23,7 @@ const password = z
   .min(MIN_LENGTH, `A password must be at least ${MIN_LENGTH} characters. Length matters more than symbols.`)
   .max(MAX_LENGTH, `A password cannot be longer than ${MAX_LENGTH} characters.`)
   .refine((v) => countClasses(v) >= MIN_CLASSES, {
-    message: `Use ${MIN_CLASSES} of: ${PASSWORD_CLASSES.map((c) => c.label).join(', ')}.`,
+    message: `Use ${MIN_CLASSES} of: ${PASSWORD_CLASSES.map((c: { label: string }) => c.label).join(', ')}.`,
   });
 
 /*
