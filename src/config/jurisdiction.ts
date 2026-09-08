@@ -95,7 +95,18 @@ export function reachOf(role: Role): Reach {
   return REACH[role];
 }
 
+/**
+ * How far a role reaches, in words.
+ *
+ * Defensive about the role, deliberately. `role` is typed as `Role`, but every
+ * value of it arrives from the API at run time, and a server that returns a
+ * role this build has never heard of used to take the whole page down: `REACH`
+ * missed, the lookup missed, and the caller did `.toLowerCase()` on undefined.
+ *
+ * An unknown role is not a crash. It is somebody whose reach this build cannot
+ * describe, which is exactly what "none" already means.
+ */
 export function reachLabel(role: Role): string {
-  const id = REACH[role];
+  const id: Reach = REACH[role] ?? 'none';
   return REACHES.find((r) => r.id === id)?.label ?? id;
 }

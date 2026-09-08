@@ -229,7 +229,11 @@ for (const file of files) {
     if (!isComment && /(:\s*any\b|\bas any\b|<any>)/.test(line) && !/eslint-disable/.test(line)) {
       add(file, n, 'any', line.trim().slice(0, 90));
     }
-    if (/\b(localStorage|sessionStorage|indexedDB)\b/.test(line)) {
+    // Comments are skipped for the same reason they are on the `any` rule: a
+    // line explaining that this product does NOT use browser storage is not a
+    // use of browser storage, and failing the build over it teaches people to
+    // stop writing the explanation.
+    if (!isComment && /\b(localStorage|sessionStorage|indexedDB)\b/.test(line)) {
       add(file, n, 'browser-storage', line.trim().slice(0, 90));
     }
   });
