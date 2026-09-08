@@ -407,12 +407,79 @@ const STAGE_PROSE: Record<string, string> = {
     'कारणों सहित एक खरीद निर्णय, परिणाम चाहे जो हो, प्रकाशित।',
 };
 
+
+/* ------------------------------------------------ the rest of the seed
+ *
+ * Integration names, screening timeline labels, risk and change-request
+ * titles, KPI names, the solution summary, and the outcome statements whose
+ * wording differs from the problem library above. Every one of these is on
+ * a page a reader opens; none of them had an entry, so they were served in
+ * English under a translated heading.
+ */
+const REMAINING_SEED: Record<string, string> = {
+  'DPIIT / Startup India recognition':
+    'DPIIT / स्टार्टअप इंडिया मान्यता',
+  'Government e-Marketplace':
+    'गवर्नमेंट ई-मार्केटप्लेस',
+  'Public Financial Management System':
+    'सार्वजनिक वित्तीय प्रबंधन प्रणाली',
+  'Government single sign-on':
+    'शासकीय एकल साइन-ऑन',
+  'Email notification service':
+    'ईमेल सूचना सेवा',
+  'Application submitted':
+    'आवेदन प्रस्तुत',
+  'Eligible — all rules passed, two relaxations applied':
+    'पात्र — सभी नियम पारित, दो छूटें लागू',
+  'Shortlisted at gate 2':
+    'द्वार 2 पर संक्षिप्त सूची में',
+  'Evaluation complete, ranked first of fourteen':
+    'मूल्यांकन पूर्ण, चौदह में प्रथम स्थान',
+  'Pilot awarded at gate 3':
+    'द्वार 3 पर पायलट आवंटित',
+  'Draft created from the outcome-based problem statement template.':
+    'परिणाम-आधारित समस्या कथन प्रारूप से प्रारूप बनाया गया।',
+  'Published after gate 1 cleared.':
+    'द्वार 1 पार होने के बाद प्रकाशित।',
+  'Masked extract query returned more rows than the agreed field list permits':
+    'प्रच्छन्न निष्कर्षण प्रश्न ने सहमत क्षेत्र-सूची से अधिक पंक्तियाँ लौटाईं',
+  'Extend the measurement window by three weeks and add two depot sites':
+    'मापन अवधि तीन सप्ताह बढ़ाएँ और दो डिपो स्थल जोड़ें',
+  'Non-revenue water in the pilot zone':
+    'पायलट क्षेत्र में गैर-राजस्व जल',
+  'Crew jobs closed on first visit':
+    'पहली ही यात्रा में बंद किए गए दल-कार्य',
+  'Acoustic leak localisation for water distribution networks':
+    'जल वितरण नेटवर्क हेतु ध्वनिक रिसाव स्थान-निर्धारण',
+  'Permanent acoustic loggers correlated against a pressure model, delivering leak localisation to a 30-metre segment into the existing complaint register.':
+    'स्थायी ध्वनिक लॉगर, दाब मॉडल से सहसंबद्ध, जो मौजूदा शिकायत रजिस्टर में 30-मीटर खंड तक रिसाव का स्थान बताते हैं।',
+  'Bring unexplained diesel draw down to a level the depot manager can investigate the same week.':
+    'अस्पष्ट डीज़ल निकासी को उस स्तर तक लाएँ जिसकी जाँच डिपो प्रबंधक उसी सप्ताह कर सके।',
+  'Find the child who is about to stop coming, while a teacher can still do something about it.':
+    'उस बच्चे को खोजें जो आना बंद करने वाला है, जब तक शिक्षक कुछ कर सकता है।',
+  'Move the same vehicles through the corridor faster in peak, using the controllers already installed.':
+    'पहले से लगे नियंत्रकों से ही, व्यस्त समय में उन्हीं वाहनों को गलियारे से तेज़ी से निकालें।',
+  'Know a light has failed before a resident tells you, and fix it inside a week.':
+    'निवासी के बताने से पहले जानें कि कोई बत्ती बंद है, और उसे एक सप्ताह के भीतर ठीक करें।',
+  'Find the assessment gap from imagery, and send a surveyor only where it matters.':
+    'चित्रण से निर्धारण-अंतर खोजें, और सर्वेक्षक केवल वहीं भेजें जहाँ वह आवश्यक है।',
+  'Private limited company':
+    'प्राइवेट लिमिटेड कंपनी',
+  'Limited liability partnership':
+    'सीमित दायित्व भागीदारी',
+  'Registered partnership':
+    'पंजीकृत भागीदारी',
+  'Sole proprietorship':
+    'एकल स्वामित्व',
+};
+
 /**
  * One flat table. Built once at module load, because the localiser walks every
  * string in every response and a chain of six lookups per string is six times
  * the work for no benefit.
  */
 export const HINDI: Readonly<Record<string, string>> = Object.freeze({
+  ...REMAINING_SEED,
   ...STAGE_PROSE,
   ...PLACES,
   ...DEPARTMENTS,

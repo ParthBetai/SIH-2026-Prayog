@@ -724,10 +724,30 @@ const en = {
   pubStatic: {
     demand: {
       heroEyebrow: "From challenge to contract",
-      heroTitleLead: "Government",
-      heroTitleAccent: "problems,",
-      heroTitleTail: "priced and open.",
-      heroLead: "Every problem here carries a measured baseline, a budget head and the scoring rubric it will be judged against. You can read all of it — including exactly how you will be marked — before deciding to spend a week on an application.",
+      heroTitleLead:
+        'Government problems,',
+      heroTitleAccent:
+        'measured,',
+      heroTitleTail:
+        'and answered in the open.',
+      heroLead:
+        'Every problem is measured before any work starts, every rupee moves against an acceptance test that has already been passed, and every pilot is published when it ends — whether or not it worked.',
+      seeTheMoney: 'Where the money goes',
+      statDistricts: 'Districts',
+      workedExample: 'A worked example. Every case on the programme is opened, held and cleared through the same seven gates.',
+      moneyEyebrow: 'Public money',
+      moneyHeading: 'Where it goes, and how fast it moves.',
+      moneyCommitted: 'Committed to pilots',
+      moneyReach: 'Across {{departments}} departments in {{districts}} districts, against {{pilots}} pilots now running.',
+      clockLabel: 'Acceptance to payment',
+      clockMedian: '{{days}} days, median',
+      clockLimit: '{{days}}-day limit',
+      clockTimeliness: '{{percent}}% of claims are paid inside the limit.',
+      moneyNote: 'Nothing is released on a promise. A milestone is paid only after its acceptance test has passed, and the clock above starts on the day it does.',
+      moneyLink: 'The full transparency register',
+      moneyErrorTitle: 'Unable to load the programme figures.',
+      moneyBoundary: 'the programme figures',
+      learnHowItWorks: 'See how the programme works',
       browseOpen: "Browse open problems",
       gatesLink: "How the seven gates work",
       statDepartments: "Departments",
@@ -745,6 +765,7 @@ const en = {
       stagesEyebrow: "Nine stages, no shortcuts",
       stagesHeading: "A problem becomes a contract in the open.",
       stagesLead: "Nothing here happens in a meeting nobody minuted. Each stage hands the case to a named role, and the gate between two stages is a written decision anyone can read afterwards.",
+      produces: 'Produces:',
       stagesCarouselLabel: "The nine stages, in order",
       srStage: "Stage {{index}}:",
       stageActorGate: "{{actor}} · clears {{gate}}",

@@ -38,6 +38,22 @@ export const PUBLIC_LINKS: readonly PublicNavLink[] = [
   { to: '/transparency', labelKey: 'bar.transparency', hintKey: 'nav.hint.transparency', open: false },
 ];
 
+/**
+ * Paths on the public site that refuse a signed-out reader.
+ *
+ * Read off the list above rather than written out again, so the nav and the
+ * body of a page can never disagree about whether a destination is open. The
+ * two extras are pages with no nav entry of their own: a challenge document,
+ * and a company's public profile — both name an identifiable firm.
+ */
+const ALSO_GATED = ['/challenges/', '/startups/'];
+
+export function needsAccount(path: string): boolean {
+  if (ALSO_GATED.some((p) => path.startsWith(p))) return true;
+  const link = PUBLIC_LINKS.find((l) => l.to === path || path.startsWith(`${l.to}/`));
+  return link ? !link.open : false;
+}
+
 /** What a visitor may be offered, given whether they hold an account. */
 export function publicLinksFor(signedIn: boolean): readonly PublicNavLink[] {
   return signedIn ? PUBLIC_LINKS : PUBLIC_LINKS.filter((l) => l.open);

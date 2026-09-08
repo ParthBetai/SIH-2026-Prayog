@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSay } from '@/lib/contentText';
 import { STAGES } from '@/config/stages';
 import { GATES, gateSlaDays, type GateId } from '@/config/gates';
 import { ROLES } from '@/config/rbac';
@@ -140,6 +142,8 @@ function Tag({ children, tone = 'plain' }: { children: React.ReactNode; tone?: '
 }
 
 export default function HowItWorks() {
+  const { t } = useTranslation();
+  const say = useSay();
   // The toggle switches the copy in place; it does not navigate to a second page.
   const [side, setSide] = useState<'department' | 'startup'>('department');
   const link = usePortalLink();
@@ -337,9 +341,9 @@ export default function HowItWorks() {
                         </h3>
                         <p className="mt-0.5 text-micro text-ink-soft">{s.actor}</p>
 
-                        <p className="mt-3 max-w-doc font-doc text-body text-ink">{copy.happens}</p>
+                        <p className="mt-3 max-w-doc font-doc text-body text-ink">{say(copy.happens)}</p>
                         <p className="mt-2 max-w-doc text-body text-ink-soft">
-                          <span className="text-ink">Produces:</span> {copy.produces}
+                          <span className="text-ink">{t('pubStatic.demand.produces')}</span> {say(copy.produces)}
                         </p>
 
                         <ul className="mt-4 flex flex-wrap gap-2">

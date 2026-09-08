@@ -270,6 +270,16 @@ export function TopBar({
   // Distinguish "nobody is signed in" from "we could not find out".
   const identityUnknown = session.isError;
   const role: Role = session.data?.data.role ?? 'public';
+
+  /*
+   * A member of the public gets a bar with nothing dead in it.
+   *
+   * Search is refused for this role at the API, so it answers every query
+   * with an empty list; alerts count things waiting on you, and nothing can
+   * wait on someone with no case, no application and no milestone. Both were
+   * controls that looked live and did nothing.
+   */
+  const publicVisitor = role === 'public';
   const items = notifications.data?.data ?? [];
   const unread = items.filter((n) => !n.read).length;
   const waiting = items.filter((n) => n.waitingOnYou && !n.read);
@@ -379,104 +389,108 @@ export function TopBar({
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPaletteOpen(true)}
-            aria-label={t('app.search')}
-            className="press hidden h-8 items-center gap-2 rounded-pill border border-deep-rule px-2 text-label text-deep-dim hover:border-deep-dim hover:bg-deep-2 hover:text-deep-ink md:inline-flex xl:px-3"
-          >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden focusable="false">
-              <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.5" />
-              <path d="m10.6 10.6 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="hidden xl:inline">{t('app.search')}</span>
-            <kbd className="hidden rounded-control border border-deep-rule px-1 text-micro xl:inline">Ctrl K</kbd>
-          </button>
+          {publicVisitor ? null : (
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              aria-label={t('app.search')}
+              className="press hidden h-8 items-center gap-2 rounded-pill border border-deep-rule px-2 text-label text-deep-dim hover:border-deep-dim hover:bg-deep-2 hover:text-deep-ink md:inline-flex xl:px-3"
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden focusable="false">
+                <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.5" />
+                <path d="m10.6 10.6 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="hidden xl:inline">{t('app.search')}</span>
+              <kbd className="hidden rounded-control border border-deep-rule px-1 text-micro xl:inline">Ctrl K</kbd>
+            </button>
+          )}
 
           <LanguagePicker compact />
 
-          <Popover
-            label={t('app.alerts')}
-            align="right"
-            trigger={({ onClick, ref, ...aria }) => (
-              <button
-                ref={ref}
-                onClick={onClick}
-                {...aria}
-                aria-label={t('app.alerts')}
-                className="press relative flex h-8 items-center gap-1.5 rounded-control border border-deep-rule px-2 text-label text-deep-dim hover:border-deep-dim hover:text-deep-ink md:px-3"
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden focusable="false">
-                  <path
-                    d="M8 1.6a4.2 4.2 0 0 0-4.2 4.2v2.6L2.6 11h10.8l-1.2-2.6V5.8A4.2 4.2 0 0 0 8 1.6ZM6.4 13a1.6 1.6 0 0 0 3.2 0"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="hidden md:inline">{t('app.alerts')}</span>
-                {unread > 0 ? <span className="text-micro text-saffron-ink tnum">{unread}</span> : null}
-                {waiting.length > 0 ? (
-                  <span aria-hidden className="absolute -right-0.5 -top-0.5 block h-2 w-2 rounded-full bg-saffron" />
-                ) : null}
-              </button>
-            )}
-          >
-            {(close) => (
-              <div className="w-[340px]">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-label text-ink">
-                    {t('chrome.waitingSummary', {
-                      waiting: waiting.length,
-                      information: items.length - waiting.length,
-                    })}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => markRead.mutate({ all: true })}
-                    className="text-micro text-ink-soft underline underline-offset-2"
-                  >
-                    {t('chrome.markAllRead')}
-                  </button>
+          {publicVisitor ? null : (
+            <Popover
+              label={t('app.alerts')}
+              align="right"
+              trigger={({ onClick, ref, ...aria }) => (
+                <button
+                  ref={ref}
+                  onClick={onClick}
+                  {...aria}
+                  aria-label={t('app.alerts')}
+                  className="press relative flex h-8 items-center gap-1.5 rounded-control border border-deep-rule px-2 text-label text-deep-dim hover:border-deep-dim hover:text-deep-ink md:px-3"
+                >
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden focusable="false">
+                    <path
+                      d="M8 1.6a4.2 4.2 0 0 0-4.2 4.2v2.6L2.6 11h10.8l-1.2-2.6V5.8A4.2 4.2 0 0 0 8 1.6ZM6.4 13a1.6 1.6 0 0 0 3.2 0"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="hidden md:inline">{t('app.alerts')}</span>
+                  {unread > 0 ? <span className="text-micro text-saffron-ink tnum">{unread}</span> : null}
+                  {waiting.length > 0 ? (
+                    <span aria-hidden className="absolute -right-0.5 -top-0.5 block h-2 w-2 rounded-full bg-saffron" />
+                  ) : null}
+                </button>
+              )}
+            >
+              {(close) => (
+                <div className="w-[340px]">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-label text-ink">
+                      {t('chrome.waitingSummary', {
+                        waiting: waiting.length,
+                        information: items.length - waiting.length,
+                      })}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => markRead.mutate({ all: true })}
+                      className="text-micro text-ink-soft underline underline-offset-2"
+                    >
+                      {t('chrome.markAllRead')}
+                    </button>
+                  </div>
+                  <ul className="max-h-[50vh] overflow-auto scroll-quiet">
+                    {items.length === 0 ? (
+                      <li className="py-4 text-body text-ink-soft">{t('chrome.nothingWaiting')}</li>
+                    ) : (
+                      items.slice(0, 12).map((n) => (
+                        <li key={n.id} className="border-b border-rule py-2 last:border-b-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              markRead.mutate({ ids: [n.id] });
+                              navigate(n.href);
+                              close();
+                            }}
+                            className="w-full text-left"
+                          >
+                            <span className="flex items-center gap-2">
+                              {n.waitingOnYou ? (
+                                <Badge tone="hold">{t('chrome.waitingOnYouBadge')}</Badge>
+                              ) : (
+                                <Badge tone="neutral">{t('chrome.informationBadge')}</Badge>
+                              )}
+                              {!n.read ? (
+                                <span aria-label="Unread" className="text-micro text-ink-soft">
+                                  {t('chrome.unread')}
+                                </span>
+                              ) : null}
+                            </span>
+                            <span className="mt-1 block text-body text-ink">{n.title}</span>
+                            <span className="block text-micro text-ink-soft">{n.detail}</span>
+                            <span className="block text-micro text-ink-soft tnum">{dayTime(n.at)}</span>
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
                 </div>
-                <ul className="max-h-[50vh] overflow-auto scroll-quiet">
-                  {items.length === 0 ? (
-                    <li className="py-4 text-body text-ink-soft">{t('chrome.nothingWaiting')}</li>
-                  ) : (
-                    items.slice(0, 12).map((n) => (
-                      <li key={n.id} className="border-b border-rule py-2 last:border-b-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            markRead.mutate({ ids: [n.id] });
-                            navigate(n.href);
-                            close();
-                          }}
-                          className="w-full text-left"
-                        >
-                          <span className="flex items-center gap-2">
-                            {n.waitingOnYou ? (
-                              <Badge tone="hold">{t('chrome.waitingOnYouBadge')}</Badge>
-                            ) : (
-                              <Badge tone="neutral">{t('chrome.informationBadge')}</Badge>
-                            )}
-                            {!n.read ? (
-                              <span aria-label="Unread" className="text-micro text-ink-soft">
-                                {t('chrome.unread')}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span className="mt-1 block text-body text-ink">{n.title}</span>
-                          <span className="block text-micro text-ink-soft">{n.detail}</span>
-                          <span className="block text-micro text-ink-soft tnum">{dayTime(n.at)}</span>
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-            )}
-          </Popover>
+              )}
+            </Popover>
+          )}
 
           <Popover
             label={t('app.account')}
